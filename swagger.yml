@@ -1,0 +1,38 @@
+openapi: '3.0.2'
+info:
+  title: vsuite public api
+  version: '1.0'
+  description: vsuites public api
+  license:
+    name: MIT
+  contact:
+    name: vsuite technical team
+    email: support@myvsuite.com
+  tags:
+    - name: team
+      description: Manage you organisations and entities
+    - name: countries
+      description: Country and currency information
+    - name: vFile
+      description: Manage 
+
+servers:
+  - url: https://server.myvsuite.com
+
+# Authentication
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: HTTP_AUTHORIZATION
+
+paths:
+  /auth/:
+    tags:
+      - team
+    summary: Auth test summary
+    get:
+      responses:
+        '200':
+          description: OK
