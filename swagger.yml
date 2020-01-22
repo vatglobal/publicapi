@@ -1,4 +1,5 @@
 openapi: '3.0.2'
+
 info:
   title: vsuite public api
   version: '1.0'
@@ -11,6 +12,10 @@ info:
   x-logo:
     url: 'https://raw.githubusercontent.com/vatglobal/publicapi/master/vsuite_logo.png'
     altText: vsuite logo
+  x-servers:
+    - url: https://server.myvsuite.com/api/v1/
+    - description: Version one API URL
+
 tags:
   - name: Entity
     description: Manage your entities
@@ -26,7 +31,7 @@ tags:
 servers:
   - url: https://server.myvsuite.com/api/v1/
 
-# Authentication
+# Authentication and schemas
 components:
   
   securitySchemes:
@@ -240,6 +245,174 @@ components:
         currency:
           $ref: "#/components/schemas/id"
 
+    ListPeriods:
+      type: object
+      required:
+        - count
+        - next
+        - previous
+        - results
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+        previous:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/Period"
+    Period:
+      type: object
+      required:
+        - id
+        - country
+        - filing_period
+        - filing_type
+        - is_day_editable
+        - is_moneth_editable
+        - comment
+        - is_automatically_created
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        country:
+          $ref: "#/components/schemas/id"
+        filing_period:
+          type: string
+        filing_type:
+          type: object
+          required:
+            - id
+            - name_short
+            - name_long
+          properties:
+            id:
+              $ref: "#/components/schemas/id"
+            name_short:
+              type: string
+            name_long:
+              type: string
+        is_day_editable:
+          type: boolean
+        is_moneth_editable:
+          type: boolean
+        comment:
+          type: string
+        is_automatically_created:
+          type: boolean
+
+    ListSavedFilingPeriods:
+      type: object
+      required:
+        - count
+        - next
+        - previous
+        - results
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+        previous:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/SavedFilingPeriod"
+    SavedFilingPeriod:
+      type: object
+      required:
+        - id
+        - filing_status
+        - outcome_type
+        - outcome_amount
+        - comment_accept_reject
+        - entity
+        - entity_name
+        - entity_colour
+        - vat_number_period
+        - filing_type
+        - country
+        - country_iso
+        - filing_period
+        - months_to_add
+        - date_filing_due
+        - date_period_ending
+        - from_day_weekend
+        - is_color_inverted
+        - number_files_attached
+        - is_vat_return_submitted
+        - submission_receipt_id
+        - is_vfile_allowed
+        - date_created
+        - date_modified
+        - date_submitted
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        filing_status:
+          type: string
+          description: "Choices: [get_started, processed, processing, compliance_errors, upload_failed, processing_errors, ready_file, ready_file_nil, awaiting_review, rejected, filed, canceled]"
+        outcome_type:
+          type: string
+          description: "Choices: [payment_due, payment_madeno_payment_due, refund_due, refund_requested, refund_carried_forward, refund_received, nil_return]"
+        outcome_amount:
+          type: number
+          format: float
+        comment_accept_reject:
+          type: string
+          description: "Comment during approval process"
+        entity:
+          $ref: "#/components/schemas/id"
+        entity_name:
+          type: string
+        entity_colour:
+          type: string
+          example: "rgba(4%,4,4%,0.4)"
+        vat_number_period:
+          $ref: "#/components/schemas/id"
+        filing_type:
+          $ref: "#/components/schemas/id"
+        country:
+          $ref: "#/components/schemas/id"
+        country_iso:
+          type: string
+        filing_period:
+          type: string
+        months_to_add:
+          type: integer
+        date_filing_due:
+          type: string
+          example: "2020-01-07"
+        date_period_ending:
+          type: string
+          example: "2020-02"
+        from_day_weekend:
+          type: string
+        is_color_inverted:
+          type: boolean
+          description: "A deadline gets its colour inverted signifies that it no longer needs to be dealt with"
+        number_files_attached:
+          type: integer
+        is_vat_return_submitted:
+          type: boolean
+          description: "Set to true when VAT return attached has been submitted by vsuite (ie. MTD for UK)"
+        submission_receipt_id:
+          type: string
+          description: "Receipt ID received when submitting with MTD"
+        is_vfile_allowed:
+          type: boolean
+        date_created:
+          type: string
+          format: date-time
+        date_modified:
+          type: string
+          format: date-time
+        date_submitted:
+          type: string
+          format: date-time
 
 
 
@@ -355,7 +528,8 @@ paths:
                 - name
                 - organization
                 - colour
-  
+
+
   /entity/{entity_id}:
 
     get:
@@ -504,8 +678,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorMessageDict"
-    
-                
 
 
   /organization:
@@ -598,7 +770,8 @@ paths:
                   description: "When TRUE, deadlines in vFlow will be moved to Friday if they fall on weekend"
               required:
                 - name
-  
+
+
   /organization/{organization_id}:
 
     get:
@@ -759,7 +932,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/errorMessageDict"
 
+
   /country:
+
     get:
       summary: List countries
       operationId: listCountries
@@ -794,7 +969,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/errorMessageDetail"
 
+
   /currency:
+
     get:
       summary: List currencies
       operationId: listCurrencies
@@ -828,3 +1005,219 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorMessageDetail"
+
+
+  /vFile/period:
+
+    get:
+      summary: List periods
+      operationId: listPeriods
+      tags:
+        - vFile
+      parameters:
+        - name: limit
+          in: query
+          description: how many items to return in one page
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: how many items to offset (number of pages * limit size)
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: List of currencies
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListPeriods"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+
+
+  /vFile/savedFilingPeriod:
+
+    post:
+      summary: List saved filing periods
+      description: "SavedFilingPeriod corresponds to a calendar event (filing date)"
+      operationId: listSFP
+      tags:
+        - vFile
+      parameters:
+        - name: limit
+          in: query
+          description: how many items to return in one page
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: how many items to offset (number of pages * limit size)
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: List of saved filing periods. Filtering applied if specified in request body.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListSavedFilingPeriods"
+        '400':
+          description: Invalid date range (if given in request body)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                list_countries:
+                  type: array
+                  items:
+                    type: string
+                  description: "list of country ids to filter saved filing periods with"
+                list_entities:
+                  type: array
+                  items:
+                    type: string
+                  description: "list of entity ids to filter saved filing periods with"
+                date_start:
+                  type: string
+                  description: "start of date range"
+                  example: "YYYY-MM-DD"
+                date_end:
+                  type: string
+                  description: "end of date range"
+                  example: "YYYY-MM-DD"
+                stage:
+                  type: string
+                  description: "Saved filing period stage. Choice of [due, preparing, filed]"
+
+
+  /vFile/savedFilingPeriod/{saved_filing_period_id}:
+
+    get:
+      summary: Get a specific saved filing period
+      operationId: getSpecificSFP
+      description: SavedFilingPeriod correspond to a calendar event (filing date)
+      tags:
+        - vFile
+      responses:
+        '200':
+          description: Saved filing period was found and could be retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavedFilingPeriod"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '404':
+          description: Saved filing period does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+
+    patch:
+      summary: Patch specific saved filing period
+      operationId: patchSpecificSFP
+      description: ->
+        SavedFilingPeriod correspond to a calendar event (filing date)
+      tags:
+        - vFile
+      responses:
+        '200':
+          description: Saved Filing Period was partially updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavedFilingPeriod"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filing_status:
+                  type: string
+                  description: "Choices: [get_started, processed, processing, compliance_errors, upload_failed, processing_errors, ready_file, ready_file_nil, awaiting_review, rejected, filed, canceled]"
+                outcome_type:
+                  type: string
+                  description: "Choices: [payment_due, payment_madeno_payment_due, refund_due, refund_requested, refund_carried_forward, refund_received, nil_return]"
+                outcome_amount:
+                  type: number
+                  format: float
+                comment_accept_reject:
+                  type: string
+                  description: "Comment during approval process"
+
+    put:
+      summary: Edit specific saved filing period
+      operationId: editSpecificSFP
+      description: ->
+        SavedFilingPeriod correspond to a calendar event (filing date)
+      tags:
+        - vFile
+      responses:
+        '200':
+          description: Saved Filing Period was updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavedFilingPeriod"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filing_status:
+                  type: string
+                  description: "Choices: [get_started, processed, processing, compliance_errors, upload_failed, processing_errors, ready_file, ready_file_nil, awaiting_review, rejected, filed, canceled]"
+                outcome_type:
+                  type: string
+                  description: "Choices: [payment_due, payment_madeno_payment_due, refund_due, refund_requested, refund_carried_forward, refund_received, nil_return]"
+                outcome_amount:
+                  type: number
+                  format: float
+                comment_accept_reject:
+                  type: string
+                  description: "Comment during approval process"  
+
