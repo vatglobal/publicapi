@@ -154,6 +154,92 @@ components:
           type: string
         vflow_block_weekends:
           type: boolean
+    
+    ListCurrencies:
+      type: object
+      required:
+        - count
+        - next
+        - previous
+        - results
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+        previous:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/Currency"
+    Currency:
+      type: object
+      required:
+        - id
+        - iso
+        - name
+        - symbol
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        iso:
+          type: string
+          description: "3 letter iso code for the currency"
+        name:
+          type: string
+        symbol:
+          type: string
+          example: "&#65;&#102;"
+    
+    ListCountries:
+      type: object
+      required:
+        - count
+        - next
+        - previous
+        - results
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+        previous:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/Country"
+    Country:
+      type: object
+      required:
+        - id
+        - iso
+        - iso_3
+        - name
+        - phone_prefix
+        - is_eu
+        - currency
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        iso:
+          type: string
+          description: "2 letter iso code for the country"
+        iso_3:
+          type: string
+          description: "iso 3 code"
+        name:
+          type: string
+        phone_prefix:
+          type: string
+          example: "43"
+        is_eu:
+          type: boolean
+          description: "Is this country in the EU?"
+        currency:
+          $ref: "#/components/schemas/id"
+
 
 
 
@@ -671,4 +757,74 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorMessageDict"     
+                $ref: "#/components/schemas/errorMessageDict"
+
+  /country:
+    get:
+      summary: List countries
+      operationId: listCountries
+      tags:
+        - Country
+      parameters:
+        - name: limit
+          in: query
+          description: how many items to return in one page
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: how many items to offset (number of pages * limit size)
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: List of countries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListCountries"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+
+  /currency:
+    get:
+      summary: List currencies
+      operationId: listCurrencies
+      tags:
+        - Currency
+      parameters:
+        - name: limit
+          in: query
+          description: how many items to return in one page
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: how many items to offset (number of pages * limit size)
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: List of currencies
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListCurrencies"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
