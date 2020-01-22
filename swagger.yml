@@ -16,8 +16,10 @@ tags:
     description: Manage your entities
   - name: Organization
     description: Manage your organizations
-  - name: Countries
-    description: Country and currency information
+  - name: Country
+    description: Country information
+  - name: Currency
+    description: Currency information
   - name: vFile
     description: Manage 
 
@@ -26,28 +28,36 @@ servers:
 
 # Authentication
 components:
+  
   securitySchemes:
+    
     ApiKeyAuth:
       type: apiKey
       in: header
       name: HTTP_AUTHORIZATION
+      description: "Use your assigined API key to authenticate. To request one, please email the vsuite technical team."
+  
   schemas:
+    
     errorMessageDetail:
       type: array
       items:
         type: string
         example: Reason why authentication failed
-    errorMessageNonField:
+
+    errorMessageDict:
       type: object
       properties:
-        non_field_errors:
+        string:
           type: array
           items:
-            type: string  
+            type: string
+
     id:
       type: string
       format: uuid
       example: fc096d1a-9535-4d8b-b504-d86a66d92de8
+
     ListEntity:
       type: object
       required:
@@ -103,11 +113,54 @@ components:
         tax_number: 
           type: string
           description: "Tax Identification Number. This is NOT the VAT number."
+    
+    ListOrganization:
+      type: object
+      required:
+        - count
+        - next
+        - previous
+        - results
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+        previous:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/Organization"
+    Organization:
+      type: object
+      required:
+        - id
+        - name
+        - management_group
+        - hide_organization
+        - internal_ref
+        - vflow_block_weekends
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        name:
+          type: string
+        management_group:
+          $ref: "#/components/schemas/id"
+        hide_organization:
+          type: boolean
+        internal_ref:
+          type: string
+        vflow_block_weekends:
+          type: boolean
 
 
 
 paths:
-  /auth/entity:
+
+  /entity:
+    
     get:
       summary: List entities
       operationId: listEntities
@@ -135,7 +188,7 @@ paths:
             format: int32
       responses:
         '200':
-          description: Expected response to a valid request
+          description: List of entities
           content:
             application/json:
               schema:
@@ -146,6 +199,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorMessageDetail"
+
     post:
       summary: Create a new entity
       operationId: createEntity
@@ -216,7 +270,8 @@ paths:
                 - organization
                 - colour
   
-  /auth/entity/{entity_id}:
+  /entity/{entity_id}:
+
     get:
       summary: Get a specific entity
       operationId: getSpecificEntity
@@ -242,6 +297,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorMessageDetail"
+
     put:
       summary: Edit specific entity
       operationId: putSpecificEntity
@@ -290,6 +346,7 @@ paths:
                 - name
                 - organization
                 - colour
+
     patch:
       summary: Patch specific entity
       operationId: patchSpecificEntity
@@ -336,6 +393,7 @@ paths:
                 tax_number:
                   type: string
                   description: "Tax Identification Number. This is NOT the VAT number."
+
     delete:
       summary: Delete an entity
       operationId: deleteEntity
@@ -359,6 +417,258 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorMessageNonField"
+                $ref: "#/components/schemas/errorMessageDict"
+    
                 
-        
+
+
+  /organization:
+
+    get:
+      summary: List organizations
+      operationId: listOrganizations
+      description: ->
+        List the organizations that the user may access (view and/or modify). 
+        Any authenticated user may call this endpoint. 
+        An empty list is returned if the user does not have access to any 
+        organizations or does not have the required permissions.
+      tags:
+        - Organization
+      parameters:
+        - name: limit
+          in: query
+          description: how many items to return in one page
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: how many items to offset (number of pages * limit size)
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: List of organizations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListOrganization"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+
+    post:
+      summary: Create a new organization
+      operationId: createOrganization
+      description: >-
+        Create new organization. Only admins and managers may create new organizations. 
+        On creating a new organization, full permissions on this organization are 
+        assigned to the creating user and all the admins in the same management group.
+      tags:
+        - Organization
+      parameters:
+        - name: management_group
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/id"
+      responses:
+        '201':
+          description: Organization was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+        '403':
+          description: Unauthorized / other authentication issue
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                management_group:
+                  $ref: "#/components/schemas/id"
+                hide_organization:
+                  type: boolean
+                  description: "User wanted to attach an entity without a team"
+                internal_ref:
+                  type: string
+                  description: "Internal reference ID to your system."
+                vflow_block_weekends:
+                  type: boolean
+                  description: "When TRUE, deadlines in vFlow will be moved to Friday if they fall on weekend"
+              required:
+                - name
+  
+  /organization/{organization_id}:
+
+    get:
+      summary: Get a specific organization
+      operationId: getSpecificOrganization
+      description: Retrieve the organization data. Only users with the `org_management` view permission may call this endpoint.
+      tags:
+        - Organization
+      responses:
+        '200':
+          description: Organization was found and could be retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '404':
+          description: Organization does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+
+    put:
+      summary: Edit specific organization
+      operationId: putSpecificOrganization
+      description: Update organization data. Only users with the `org_management` modify permission may call this endpoint.
+      tags:
+        - Organization
+      responses:
+        '200':
+          description: Organization was updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Cannot change the management group of an organization
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+        '404':
+          description: Organization does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                management_group:
+                  $ref: "#/components/schemas/id"
+                hide_organization:
+                  type: boolean
+                  description: "User wanted to attach an entity without a team"
+                internal_ref:
+                  type: string
+                  description: "Internal reference ID to your system."
+                vflow_block_weekends:
+                  type: boolean
+                  description: "When TRUE, deadlines in vFlow will be moved to Friday if they fall on weekend"
+              required:
+                - name
+
+    patch:
+      summary: Patch specific organization
+      operationId: patchSpecificOrganization
+      description: ->
+        Partial update of organization data. Only users with the `org_management' 
+        modify permission may call this endpoint.
+      tags:
+        - Organization
+      responses:
+        '200':
+          description: Organization was partially updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Cannot change the management group of an organization
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+        '404':
+          description: Organization does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                management_group:
+                  $ref: "#/components/schemas/id"
+                hide_organization:
+                  type: boolean
+                  description: "User wanted to attach an entity without a team"
+                internal_ref:
+                  type: string
+                  description: "Internal reference ID to your system."
+                vflow_block_weekends:
+                  type: boolean
+                  description: "When TRUE, deadlines in vFlow will be moved to Friday if they fall on weekend"
+
+    delete:
+      summary: Delete an organization
+      operationId: deleteOrganization
+      description: ->
+        Deletes the organization. Only users with the `org_management` 
+        modify permission may call this endpoint. NOTE! Only organizations 
+        with no entities may be deleted. If the organization contains entities, 
+        these need to be deleted/moved to a different organization first.
+      tags:
+        - Organization
+      responses:
+        '204':
+          description: Organization was deleted
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Organization can't be deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"     
