@@ -687,6 +687,87 @@ components:
         is_other:
           type: boolean
 
+    StandardTemplateList:
+      type: object
+      required:
+        - count
+        - next
+        - previous
+        - results
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+        previous:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/StandardTemplate"
+    StandardTemplate:
+      type: object
+      required:
+        - comment_accept_reject
+        - date_created
+        - date_entries_modified
+        - dote_modified
+        - error_reason
+        - id
+        - is_data_processing
+        - is_data_processing_aggregate
+        - is_polish_template
+        - need_process_vat_return
+        - no_data
+        - number_transactions_not_processed
+        - old_vsuite
+        - old_vsuite_file_generated
+        - saved_filing_period
+        - system_error
+        - total_net_ecsl
+        - upload_failed
+      properties:
+        comment_accept_reject:
+          type: string
+        date_created:
+          type: string
+          format: date-time
+        date_entries_modified:
+          type: string
+          format: date-time
+        date_modified:
+          type: string
+          format: date-time
+        error_reason:
+          type: string
+        id:
+          $ref: "#/components/schemas/id"
+        is_data_processing:
+          type: boolean
+        is_data_processing_aggregate:
+          type: boolean
+        is_polish_template:
+          type: boolean
+        need_process_vat_return:
+          type: boolean
+        no_data:
+          type: boolean
+        number_transactions_not_processed:
+          type: integer
+        old_vsuite:
+          type: boolean
+        old_vsuite_file_generated:
+          type: boolean
+        saved_filing_period:
+          $ref: "#/components/schemas/id"
+        system_error:
+          type: boolean
+        total_net_ecsl:
+          type: number
+          format: float
+        upload_failed:
+          type: boolean
+
 
 paths:
 
@@ -1015,6 +1096,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Organization"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
         '403':
           description: Forbidden
           content:
@@ -1625,6 +1712,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/VatNumberSpecific"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
         '403':
           description: Forbidden
           content:
@@ -1963,6 +2056,164 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/VatReturnEntryList"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+
+
+  /vFile/standardTemplate/:
+
+    get:
+      summary: List standard templates
+      operationId: listStandardTemplates
+      description: ->
+        Retrieve a list of standard templates for a given saved filing period
+      tags:
+        - Standard template
+      parameters:
+        - name: saved_filing_period
+          in: query
+          description: Saved_filing_period id to get standard templates for
+          required: true
+          schema:
+            $ref: "#/components/schemas/id"
+        - name: limit
+          in: query
+          description: how many items to return in one page
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: how many items to offset (number of pages * limit size)
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: List of standard templates
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardTemplateList"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+
+    post:
+      summary: Create a new standard tempalte
+      operationId: createStandardTemplate
+      description: >-
+        Create a new standard template for a given saved filing period
+      tags:
+        - Standard template
+      responses:
+        '201':
+          description: Standard template was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardTemplate"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+  
+
+  /vFile/standardTemplate/{standard_template_id}:
+
+    get:
+      summary: Retrieve standard template
+      operationId: getStandardTemplate
+      description: ->
+        Retrieve a standard template
+      tags:
+        - Standard template
+      responses:
+        '200':
+          description: Retrieve standard template
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardTemplate"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+
+    put:
+      summary: Edit specific standard template
+      operationId: editSpecificStandardTemplate
+      tags:
+        - Standard template
+      responses:
+        '200':
+          description: Standard template was updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardTemplate"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+
+    patch:
+      summary: Partially edit specific standard template
+      operationId: partiallyEditSpecificStandardTemplate
+      tags:
+        - Standard template
+      responses:
+        '200':
+          description: Standard template was partially updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardTemplate"
         '401':
           description: Unauthorized
           content:
