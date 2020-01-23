@@ -26,7 +26,13 @@ tags:
   - name: Currency
     description: Currency information
   - name: vFile
-    description: Manage 
+    description: Manage
+  - name: Vat number
+    description: Manage your vat number objects
+  - name: Saved filing periods
+    description: Manage your saved filing period objects
+  - name: Period
+    description: Manage your period objects
 
 servers:
   - url: https://server.myvsuite.com/api/v1/
@@ -414,7 +420,206 @@ components:
           type: string
           format: date-time
 
+    VatNumberSpecificList:
+      type: object
+      required:
+        - count
+        - next
+        - previous
+        - results
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+        previous:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/VatNumberSpecific"
+    VatNumberSpecific:
+      type: object
+      required:
+        - id
+        - country
+        - number
+        - date_registration
+        - list_vat_number_period
+        - has_client_transaction_types
+        - date_modified
+        - date_created
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        country:
+          type: object
+          required:
+            - id
+            - name
+            - iso
+          properties:
+            id:
+              $ref: "#/components/schemas/id"
+            name:
+              type: string
+            iso:
+              type: string
+              description: "Two letter iso code of the country"
+              example: "GB"
+        number:
+          type: string
+        date_registration:
+          type: string
+          format: date-time
+        list_vat_number_period:
+          type: array
+          items:
+            type: object
+            properties:
+              period:
+                type: object
+                required:
+                  - id
+                  - country
+                  - filing_period
+                  - filing_type
+                  - is_day_editable
+                  - is_month_editable
+                  - comment
+                  - is_automatically_created
+                properties:
+                  id:
+                    $ref: "#/components/schemas/id"
+                  country:
+                    $ref: "#/components/schemas/id"
+                  filing_period:
+                    type: string
+                    description: "Choices: [monthly, monthly_extension, bi-monthly, quarterly, quarterly_extension, annually, semi-annually, tri-annually]"
+                  filing_type:
+                    type: object
+                    required:
+                      - id
+                      - name_short
+                      - name_long
+                    properties:
+                      id:
+                        $ref: "#/components/schemas/id"
+                      name_short:
+                        type: string
+                      name_long:
+                        type: string
+                  is_day_editable:
+                    type: boolean
+                  is_month_editable:
+                    type: boolean
+                  comment:
+                    type: string
+                  is_automatically_created:
+                    type: boolean
+              day_month:
+                type: integer
+              working_day_number:
+                type: integer
+              ending_month:
+                type: array
+                items:
+                  type: integer
+              internal_ref:
+                type: string
+              date_modified:
+                type: string
+                format: date-time
+              date_created:
+                type: string
+                format: date-time
+        has_client_transaction_types:
+          type: boolean
+        date_modified:
+          type: string
+          format: date-time
+        date_created:
+          type: string
+          format: date-time    
+          
+    VatNumberAllList:
+      type: object
+      required:
+        - count
+        - next
+        - previous
+        - results
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+        previous:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/VatNumberAll"
+    VatNumberAll:
+      type: object
+      required:
+        - id
+        - entity
+        - country
+        - number
+        - has_client_transaction_types
+        - date_registration
+        - date_modified
+        - date_created
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        entity:
+          type: object
+          required:
+            - id
+            - name
+            - colour
+          properties:
+            id:
+              $ref: "#/components/schemas/id"
+            name:
+              type: string
+            colour:
+              type: string
+              example: "rgba(4%,4,4%,0.4)"
+        country:
+          type: object
+          required:
+            - id
+            - name
+            - iso
+            - is_eu
+          properties:
+            id:
+              $ref: "#/components/schemas/id"
+            name:
+              type: string
+            iso:
+              type: string
+              example: "GB"
+            is_eu:
+              type: boolean
+        number:
+          type: string
+        has_client_transaction_types:
+          type: boolean
+        date_registration:
+          type: string
+          format: date-time
+        date_modified:
+          type: string
+          format: date-time
+        date_created:
+          type: string
+          format: date-time
 
+                
 
 paths:
 
@@ -500,11 +705,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/errorMessageDetail"
         '403':
-          description: Unauthorized / Limited to one entity
+          description: Forbidden / Limited to one entity
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorMessageDetail"
+                $ref: "#/components/schemas/errorMessageDict"
       requestBody:
         content:
           application/json:
@@ -556,7 +761,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorMessageDetail"
+                $ref: "#/components/schemas/errorMessageDict"
 
     put:
       summary: Edit specific entity
@@ -582,7 +787,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorMessageDetail"
+                $ref: "#/components/schemas/errorMessageDict"
       requestBody:
         content:
           application/json:
@@ -673,7 +878,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/errorMessageDetail"
         '403':
-          description: Entity can't be deleted
+          description: Forbidden, Entity can't be deleted
           content:
             application/json:
               schema:
@@ -744,7 +949,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Organization"
         '403':
-          description: Unauthorized / other authentication issue
+          description: Forbidden
           content:
             application/json:
               schema:
@@ -798,7 +1003,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorMessageDetail"
+                $ref: "#/components/schemas/errorMessageDict"
 
     put:
       summary: Edit specific organization
@@ -885,7 +1090,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorMessageDetail"
+                $ref: "#/components/schemas/errorMessageDict"
       requestBody:
         content:
           application/json:
@@ -926,7 +1131,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/errorMessageDetail"
         '403':
-          description: Organization can't be deleted
+          description: Forbidden, organization can't be deleted
           content:
             application/json:
               schema:
@@ -1013,7 +1218,7 @@ paths:
       summary: List periods
       operationId: listPeriods
       tags:
-        - vFile
+        - Period
       parameters:
         - name: limit
           in: query
@@ -1051,7 +1256,7 @@ paths:
       description: "SavedFilingPeriod corresponds to a calendar event (filing date)"
       operationId: listSFP
       tags:
-        - vFile
+        - Saved filing periods
       parameters:
         - name: limit
           in: query
@@ -1122,7 +1327,7 @@ paths:
       operationId: getSpecificSFP
       description: SavedFilingPeriod correspond to a calendar event (filing date)
       tags:
-        - vFile
+        - Saved filing periods
       responses:
         '200':
           description: Saved filing period was found and could be retrieved
@@ -1141,7 +1346,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorMessageDetail"
+                $ref: "#/components/schemas/errorMessageDict"
 
     patch:
       summary: Patch specific saved filing period
@@ -1149,7 +1354,7 @@ paths:
       description: ->
         SavedFilingPeriod correspond to a calendar event (filing date)
       tags:
-        - vFile
+        - Saved filing periods
       responses:
         '200':
           description: Saved Filing Period was partially updated
@@ -1188,7 +1393,7 @@ paths:
       description: ->
         SavedFilingPeriod correspond to a calendar event (filing date)
       tags:
-        - vFile
+        - Saved filing periods
       responses:
         '200':
           description: Saved Filing Period was updated
@@ -1221,3 +1426,354 @@ paths:
                   type: string
                   description: "Comment during approval process"  
 
+
+  /vFile/vatNumber?entity_id='all':
+
+    get:
+      summary: List all vat numbers
+      operationId: listAllVatnumbers
+      description: ->
+        Retrieve a list of all vat numbers
+      tags:
+        - Vat number
+      parameters:
+        - name: entity_id
+          in: query
+          description: "Gets vat numbers for all entities"
+          required: true
+          schema:
+            type: string
+            example: "all"
+        - name: limit
+          in: query
+          description: how many items to return in one page
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: how many items to offset (number of pages * limit size)
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: List of vat numbers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VatNumberAllList"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+
+
+  /vFile/vatNumber?entity_id='<entity_id>':
+
+    get:
+      summary: List entity vat numbers
+      operationId: listEntityVatnumbers
+      description: ->
+        Retrieve a list of vat numbers for a specific entity
+      tags:
+        - Vat number
+      parameters:
+        - name: entity_id
+          in: query
+          description: "Filters for vat numbers in a specific entity"
+          required: true
+          schema:
+            type: string
+            example: "<entity_id>"
+        - name: limit
+          in: query
+          description: how many items to return in one page
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: how many items to offset (number of pages * limit size)
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: List of vat numbers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VatNumberSpecificList"
+        '400':
+          description: Entity does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+    
+
+  /vFile/vatNumber:
+
+    post:
+      summary: Create a new vat number
+      operationId: createVatNumber
+      description: >-
+        Create a new VAT number. Only admins, managers, account managers and registrations 
+        account managers may create new VAT numbers. On creating a new VAT number, 
+        full permissions on this VAT number are assigned to: 
+        the creating user; all account managers that have access to the entity that 
+        this VAT number belongs to; all managers that have access to the organization 
+        containing the entity that the VAT number belongs to; all admins in the same management group.
+      tags:
+        - Vat number
+      responses:
+        '201':
+          description: Vat number was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VatNumberSpecific"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - entity
+                - country
+                - number
+                - date_registration
+                - list_vat_number_period
+              properties:
+                entity:
+                  $ref: "#/components/schemas/id"
+                country:
+                  $ref: "#/components/schemas/id"
+                number:
+                  type: string
+                  description: "Vat number"
+                  example: "GB01010123"
+                date_registration:
+                  type: string
+                  example: "YYYY-MM-DD"
+                list_vat_number_period:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - period
+                      - day_month
+                      - ending_month
+                      - internal_ref
+                    properties:
+                      period:
+                        $ref: "#/components/schemas/id"
+                      day_month:
+                        type: integer
+                      ending_month:
+                        type: array
+                        items:
+                          type: integer
+                      internal_ref:
+                        type: string
+
+
+  /vFile/vatNumber/{vat_number_id}/:
+
+    put:
+      summary: Edit specific vat number
+      operationId: putSpecificVatNumber
+      description: "Update an existing VAT number. Only users with the 'vat_reg_info' modify permission may call this endpoint."
+      tags:
+        - Vat number
+      responses:
+        '200':
+          description: Vat number was updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VatNumberSpecific"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+        '404':
+          description: Vat number does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - entity
+                - country
+                - number
+                - date_registration
+                - list_vat_number_period
+              properties:
+                entity:
+                  $ref: "#/components/schemas/id"
+                country:
+                  $ref: "#/components/schemas/id"
+                number:
+                  type: string
+                  description: "Vat number"
+                  example: "GB01010123"
+                date_registration:
+                  type: string
+                  example: "YYYY-MM-DD"
+                list_vat_number_period:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - period
+                      - day_month
+                      - ending_month
+                      - internal_ref
+                    properties:
+                      period:
+                        $ref: "#/components/schemas/id"
+                      day_month:
+                        type: integer
+                      ending_month:
+                        type: array
+                        items:
+                          type: integer
+                      internal_ref:
+                        type: string
+
+    patch:
+      summary: Partial update specific vat number
+      operationId: patchSpecificVatNumber
+      description: "Perform a partial update on an existing VAT number. Only users with the 'vat_reg_info' modify permission may call this endpoint."
+      tags:
+        - Vat number
+      responses:
+        '200':
+          description: Vat number was partially updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VatNumberSpecific"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+        '404':
+          description: Entity does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                entity:
+                  $ref: "#/components/schemas/id"
+                country:
+                  $ref: "#/components/schemas/id"
+                number:
+                  type: string
+                  description: "Vat number"
+                  example: "GB01010123"
+                date_registration:
+                  type: string
+                  example: "YYYY-MM-DD"
+                list_vat_number_period:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - period
+                      - day_month
+                      - ending_month
+                      - internal_ref
+                    properties:
+                      period:
+                        $ref: "#/components/schemas/id"
+                      day_month:
+                        type: integer
+                      ending_month:
+                        type: array
+                        items:
+                          type: integer
+                      internal_ref:
+                        type: string
+
+    delete:
+      summary: Delete a vat number
+      operationId: deleteVatNumber
+      description: ->
+        Mark an existing VAT number as deleted. NOTE! The VAT number is NOT physically deleted.
+      tags:
+        - Vat number
+      responses:
+        '204':
+          description: Vat number was marked as deleted
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden, organization can't be deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
