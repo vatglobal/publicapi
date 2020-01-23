@@ -25,7 +25,7 @@ tags:
     description: Country information
   - name: Currency
     description: Currency information
-  - name: vFile
+  - name: VAT return
     description: Manage
   - name: Vat number
     description: Manage your vat number objects
@@ -33,6 +33,8 @@ tags:
     description: Manage your saved filing period objects
   - name: Period
     description: Manage your period objects
+  - name: Standard template
+    description: Standard templates are how we map transaction data to a saved filing period
 
 servers:
   - url: https://server.myvsuite.com/api/v1/
@@ -59,10 +61,12 @@ components:
     errorMessageDict:
       type: object
       properties:
-        string:
+        error_keyword:
           type: array
           items:
             type: string
+            example: Details of the error
+
 
     id:
       type: string
@@ -619,7 +623,70 @@ components:
           type: string
           format: date-time
 
-                
+    VatReturnEntryList:
+      type: object
+      required:
+        - count
+        - next
+        - previous
+        - results
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+        previous:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/VatReturnEntry"
+    VatReturnEntry:
+      type: object
+      required:
+        - standard_template
+        - meta_draft_return_box
+        - total_net
+        - total_vat
+        - value_other
+        - name
+        - description
+        - group
+        - color
+        - position
+        - is_net
+        - is_vat
+        - is_other
+      properties:
+        standard_template:
+          $ref: "#/components/schemas/id"
+        meta_draft_return_box:
+          $ref: "#/components/schemas/id"
+        total_net:
+          type: number
+          format: float
+        total_vat:
+          type: number
+          format: float
+        value_other:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        position:
+          type: integer
+        group:
+          type: string
+        color:
+          type: string
+        is_net:
+          type: boolean
+        is_vat:
+          type: boolean
+        is_other:
+          type: boolean
+
 
 paths:
 
@@ -1777,3 +1844,135 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorMessageDict"
+
+
+  /vFile/generateVatReturn/{standard_template_id}/:
+
+    post:
+      summary: Generate vat return
+      description: "Generate the vat return for a standard template"
+      operationId: generateDraftReturn
+      tags:
+        - VAT return
+      responses:
+        '200':
+          description: Vat return generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VatReturnEntry"
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '416':
+          description: Country not available in processing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+
+
+  /vFile/standardTemplate/uploadJobStart/{standard_template_id}/:
+
+    post:
+      summary: Run standard template compliance checks
+      description: ->
+        Call to start compliance checks for uploaded 
+        saved_filing_period files, gamechanger files, and JSON uploads.
+        Creates a new StandardTemplateJob for each file sent in request body. 
+        This will overwrite all previous transaction data for this 
+        standard template, including all versions.
+      operationId: runSTComplianceChecks
+      tags:
+        - Standard template
+      responses:
+        '201':
+          description: Jobs started
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                standard_template_file_list:
+                  type: array
+                  description: "List of saved_filing_period file ids"
+                  items:
+                    $ref: "#/components/schemas/id"
+                standard_template_json_upload_list:
+                  type: array
+                  description: "List of JSON upload ids"
+                  items:
+                    $ref: "#/components/schemas/id"
+                standard_template_gc_file_list:
+                  type: array
+                  description: "List of game changer file ids"
+                  items:
+                    $ref: "#/components/schemas/id"
+
+
+  /vFile/vatReturnEntry/{standard_template_id}/:
+
+    get:
+      summary: List vat return entries
+      operationId: listVatReturnEntries
+      description: ->
+        Retrieve a list of vat return entries for a standard template
+      tags:
+        - VAT return
+      parameters:
+        - name: limit
+          in: query
+          description: how many items to return in one page
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: how many items to offset (number of pages * limit size)
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: List of vat numbers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VatReturnEntryList"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+
