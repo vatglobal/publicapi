@@ -989,6 +989,39 @@ components:
             type: string
             example: "Type of compliance error, denoted by a error code"
 
+    StandardTemplateTransactionType:
+      type: object
+      required:
+        - entries
+        - entry_errors
+      properties:
+        entries:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - name
+            properties:
+              id:
+                $ref: "#/components/schemas/id"
+              name:
+                type: string
+                example: "Local sale (CN)"
+        entry_errors:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - name
+            properties:
+              id:
+                $ref: "#/components/schemas/id"
+              name:
+                type: string
+                example: "Local sale (CN)"
+
 paths:
 
   /entity:
@@ -2451,7 +2484,7 @@ paths:
   /vFile/standardTemplateAggregate/{standard_template_id}/:
 
     get:
-      summary: List standard template aggregates
+      summary: List aggregates
       operationId: listStandardTemplateAggregates
       description: ->
         Retrieve a list of standard template aggregates for a given standard template.
@@ -2498,7 +2531,7 @@ paths:
   /vFile/standardTemplateEntry/{standard_template_id}/:
 
     get:
-      summary: List standard template entries
+      summary: List entries
       operationId: listStandardTemplateEntries
       description: ->
         Retrieve a list of standard template entries for a given standard template. 
@@ -2557,7 +2590,7 @@ paths:
   /vFile/standardTemplateEntryError/{standard_template_id}/:
 
     get:
-      summary: List standard template entry errors
+      summary: List entry errors
       operationId: listStandardTemplateEntryErrors
       description: ->
         Retrieve a list of standard template entry errors for a given standard template. 
@@ -2599,6 +2632,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/StandardTemplateEntryErrorList"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+
+
+  /vFile/standardTemplateTransactionTypes/{standard_template_id}/:
+
+    get:
+      summary: List transaction types
+      operationId: listStandardTemplateTransactionTypes
+      description: ->
+        List of distinct client transaction types for entries and entry errors in a StandardTemplate
+      tags:
+        - Standard template
+      responses:
+        '200':
+          description: List of distict transaction types
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardTemplateTransactionType"
         '401':
           description: Unauthorized
           content:
