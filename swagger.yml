@@ -768,6 +768,226 @@ components:
         upload_failed:
           type: boolean
 
+    StandardTemplateAggregateList:
+      type: object
+      required:
+        - count
+        - next
+        - previous
+        - results
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+        previous:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/StandardTemplateAggregateList"
+    StandardTemplateAggregate:
+      type: object
+      required:
+        - id
+        - client_transaction_type
+        - client_transaction_type_name
+        - vg_transaction_type
+        - vg_transaction_type_name
+        - input_output
+        - blank_aggregate
+        - total_net
+        - total_vat
+        - total_rows
+        - total_errors
+        - total_warnings
+        - status
+        - running_job
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        client_transaction_type:
+          $ref: "#/components/schemas/id"
+        client_transaction_type_name:
+          type: string
+        vg_transaction_type:
+          $ref: "#/components/schemas/id"
+        vg_transaction_type_name:
+          type: string
+        input_output:
+          type: string
+        blank_aggregate:
+          type: boolean
+        total_net:
+          type: number
+          format: float
+        total_vat:
+          type: number
+          format: float
+        total_rows:
+          type: integer
+        total_errors:
+          type: integer
+        total_warnings:
+          type: integer
+        status:
+          type: string
+        running_job:
+          type: boolean
+
+    StandardTemplateEntryList:
+      type: object
+      required:
+        - count
+        - next
+        - previous
+        - results
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+        previous:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/StandardTemplateEntry"
+    StandardTemplateEntry:
+      type: object
+      required:
+        - id
+        - standard_template
+        - invoice_number
+        - invoice_date
+        - partner_name
+        - partner_country
+        - partner_vat_number
+        - net_orig
+        - vat_orig
+        - gross_orig
+        - comments
+        - ccy_transaction
+        - client_transaction_type
+        - warnings
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        standard_template:
+          $ref: "#/components/schemas/id"
+        invoice_number:
+          type: string
+        invoice_date:
+          type: string
+          example: "YYYY-MM-DD"
+        partner_name:
+          type: string
+        partner_country:
+          type: string
+          example: "GB"
+        partner_vat_number:
+          type: string
+        net_orig:
+          type: number
+          format: float
+        vat_orig:
+          type: number
+          format: float
+        gross_orig:
+          type: number
+          format: float
+        comments:
+          type: string
+        ccy_transaction:
+          type: string
+          example: "EUR"
+        client_transaction_type:
+          type: string
+        warnings:
+          type: array
+          items:
+            type: string
+            example: "Type of compliance warning, denoted by a warning code"
+      
+    StandardTemplateEntryErrorList:
+      type: object
+      required:
+        - count
+        - next
+        - previous
+        - results
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+        previous:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/StandardTemplateEntryError"
+    StandardTemplateEntryError:
+      type: object
+      required:
+        - id
+        - standard_template
+        - invoice_number
+        - invoice_date
+        - partner_name
+        - partner_country
+        - partner_vat_number
+        - net_orig
+        - vat_orig
+        - gross_orig
+        - comments
+        - ccy_transaction
+        - client_transaction_type
+        - warnings
+        - errors
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        standard_template:
+          $ref: "#/components/schemas/id"
+        invoice_number:
+          type: string
+        invoice_date:
+          type: string
+          example: "YYYY-MM-DD"
+        partner_name:
+          type: string
+        partner_country:
+          type: string
+          example: "GB"
+        partner_vat_number:
+          type: string
+        net_orig:
+          type: number
+          format: float
+        vat_orig:
+          type: number
+          format: float
+        gross_orig:
+          type: number
+          format: float
+        comments:
+          type: string
+        ccy_transaction:
+          type: string
+          example: "EUR"
+        client_transaction_type:
+          type: string
+        warnings:
+          type: array
+          items:
+            type: string
+            example: "Type of compliance warning, denoted by a warning code"
+        errors:
+          type: array
+          items:
+            type: string
+            example: "Type of compliance error, denoted by a error code"
 
 paths:
 
@@ -2227,3 +2447,167 @@ paths:
               schema:
                 $ref: "#/components/schemas/errorMessageDict"
 
+
+  /vFile/standardTemplateAggregate/{standard_template_id}/:
+
+    get:
+      summary: List standard template aggregates
+      operationId: listStandardTemplateAggregates
+      description: ->
+        Retrieve a list of standard template aggregates for a given standard template.
+        An aggregate is a summary of all transactions for a transaction_type. It is useful 
+        for getting a high level view of your standard template transaction data.
+      tags:
+        - Standard template
+      parameters:
+        - name: limit
+          in: query
+          description: how many items to return in one page
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: how many items to offset (number of pages * limit size)
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: List of standard template aggregates
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardTemplateAggregateList"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+
+
+  /vFile/standardTemplateEntry/{standard_template_id}/:
+
+    get:
+      summary: List standard template entries
+      operationId: listStandardTemplateEntries
+      description: ->
+        Retrieve a list of standard template entries for a given standard template. 
+        An entry is a transaction without any compliance errors.
+      tags:
+        - Standard template
+      parameters:
+        - name: search
+          in: query
+          description: text string to search against all entry columns
+          required: false
+          schema:
+            type: string
+            example: "IC delivery of goods"
+        - name: client_transaction_type
+          in: query
+          description: id of client transaction type to filter entries by
+          required: false
+          schema:
+            $ref: "#/components/schemas/id"
+        - name: limit
+          in: query
+          description: how many items to return in one page
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: how many items to offset (number of pages * limit size)
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: List of standard template entries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardTemplateEntryList"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+
+
+  /vFile/standardTemplateEntryError/{standard_template_id}/:
+
+    get:
+      summary: List standard template entry errors
+      operationId: listStandardTemplateEntryErrors
+      description: ->
+        Retrieve a list of standard template entry errors for a given standard template. 
+        An entry error is a transaction with at least one compliance error.
+      tags:
+        - Standard template
+      parameters:
+        - name: search
+          in: query
+          description: text string to search against all entry error columns
+          required: false
+          schema:
+            type: string
+            example: "IC delivery of goods"
+        - name: client_transaction_type
+          in: query
+          description: id of client transaction type to filter entry errors by
+          required: false
+          schema:
+            $ref: "#/components/schemas/id"
+        - name: limit
+          in: query
+          description: how many items to return in one page
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: how many items to offset (number of pages * limit size)
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: List of standard template entry errors
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardTemplateEntryErrorList"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
