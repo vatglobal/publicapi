@@ -1022,6 +1022,130 @@ components:
                 type: string
                 example: "Local sale (CN)"
 
+    StandardTemplateJSONUploadNoRowsList:
+      type: object
+      required:
+        - count
+        - next
+        - previous
+        - results
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+        previous:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/StandardTemplateJSONUploadNoRows"
+    StandardTemplateJSONUploadNoRows:
+      type: object
+      required:
+        - id
+        - standard_template
+        - name
+        - date_uploaded
+        - date_modified
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        standard_template:
+          $ref: "#/components/schemas/id"
+        name:
+          type: string
+        date_uploaded:
+          type: string
+          format: date-time
+        date_modified:
+          type: string
+          format: date-time
+    StandardTemplateJSONUploadRows:
+      type: object
+      required:
+        - id
+        - standard_template
+        - name
+        - date_uploaded
+        - date_modified
+        - rows
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        standard_template:
+          $ref: "#/components/schemas/id"
+        name:
+          type: string
+        date_uploaded:
+          type: string
+          format: date-time
+        date_modified:
+          type: string
+          format: date-time
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/StandardTemplateJSONUploadIndividualRow"
+    StandardTemplateJSONUploadIndividualRow:
+      type: object
+      required:
+        - id
+        - json_upload
+        - invoice_number
+        - invoice_date
+        - partner_name
+        - partner_country
+        - partner_vat_number
+        - ccy_transaction
+        - net_orig
+        - vat_orig
+        - gross_orig
+        - client_transaction_type
+        - comments
+        - date_created
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        json_upload:
+          $ref: "#/components/schemas/id"
+        invoice_number:
+          type: string
+          example: "GB12377718928"
+        invoice_date:
+          type: string
+          example: "DD/MM/YYYY"
+        partner_name:
+          type: string
+        partner_country:
+          type: string
+          example: "GB"
+        partner_vat_number:
+          type: string
+          example: "GB12377718928"
+        ccy_transaction:
+          type: string
+          example: "GBP"
+        net_orig:
+          type: string
+          example: "954.32"
+        vat_orig:
+          type: string
+          example: "954.32"
+        gross_orig:
+          type: string
+          example: "954.32"
+        client_transaction_type:
+          type: string
+          example: "Local purchase"
+        comments:
+          type: string
+        date_created:
+          type: string
+          format: date-time
+
+
+
 paths:
 
   /entity:
@@ -2670,6 +2794,242 @@ paths:
                 $ref: "#/components/schemas/errorMessageDetail"
         '403':
           description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+
+
+  /vFile/standardTemplateJSONUpload/{standard_template}/:
+
+    get:
+      summary: List JSON uploads files
+      operationId: listStandardTemplateJSONfiles
+      description: ->
+        List all JSON upload files for a standard template
+      tags:
+        - Standard template
+      responses:
+        '200':
+          description: List of JSON upload files
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardTemplateJSONUploadNoRowsList"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+
+    post:
+      summary: Create a new JSON Upload
+      description: ->
+        Send row data to save as a JSON upload object.
+        This JSON upload object can then be used as data
+        for the associated standard template.
+      operationId: createJSONUpload
+      tags:
+        - Standard template
+      responses:
+        '201':
+          description: JSON upload object created
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - list_rows
+              properties:
+                name:
+                  type: string
+                list_rows:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      invoice_number:
+                        type: string
+                        example: "GB12377718928"
+                      invoice_date:
+                        type: string
+                        example: "DD/MM/YYYY"
+                      partner_name:
+                        type: string
+                      partner_country:
+                        type: string
+                        example: "GB"
+                      partner_vat_number:
+                        type: string
+                        example: "GB12377718928"
+                      ccy_transaction:
+                        type: string
+                        example: "GBP"
+                      net_orig:
+                        type: string
+                        example: "954.32"
+                      vat_orig:
+                        type: string
+                        example: "954.32"
+                      gross_orig:
+                        type: string
+                        example: "954.32"
+                      client_transaction_type:
+                        type: string
+                        example: "Local purchase"
+
+
+  /vFile/standardTemplateJSONUpload/{standard_template}/{json_upload_id}/:
+
+    get:
+      summary: List JSON uploads file rows
+      operationId: listStandardTemplateJSONfileRows
+      description: ->
+        List all rows for a JSON upload file in a standard template
+      tags:
+        - Standard template
+      responses:
+        '200':
+          description: List of JSON upload file rows
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardTemplateJSONUploadRows"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+
+    put:
+      summary: Edit JSON upload rows
+      operationId: putJSONUploadRows
+      description: ->
+        Update an existing JSON upload. Options
+
+          1) Edit an existing row `id=row_id`
+          2) Add a new row `id=null`
+          3) Remove a row `id=row_id and removed=true`
+      tags:
+        - Standard template
+      responses:
+        '200':
+          description: JSON upload and rows were updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardTemplateJSONUploadRows"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - list_rows
+              properties:
+                name:
+                  type: string
+                list_rows:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                        description: "ID if editing an existing row. null if adding a new row"
+                      invoice_number:
+                        type: string
+                        example: "GB12377718928"
+                      invoice_date:
+                        type: string
+                        example: "DD/MM/YYYY"
+                      partner_name:
+                        type: string
+                      partner_country:
+                        type: string
+                        example: "GB"
+                      partner_vat_number:
+                        type: string
+                        example: "GB12377718928"
+                      ccy_transaction:
+                        type: string
+                        example: "GBP"
+                      net_orig:
+                        type: string
+                        example: "954.32"
+                      vat_orig:
+                        type: string
+                        example: "954.32"
+                      gross_orig:
+                        type: string
+                        example: "954.32"
+                      client_transaction_type:
+                        type: string
+                        example: "Local purchase"
+                      removed:
+                        type: boolean
+                        description: "Add this flag to remove a row. If removing, only include id attribute alongside this flag."
+
+    delete:
+      summary: Delete a JSON upload
+      operationId: deleteJSONUpload
+      description: ->
+        Deletes JSON upload object and all associated rows
+      tags:
+        - Standard template
+      responses:
+        '204':
+          description: JSON upload was deleted
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden, Entity can't be deleted
           content:
             application/json:
               schema:
