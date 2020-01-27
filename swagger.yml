@@ -1195,20 +1195,19 @@ paths:
       summary: Create a new entity
       operationId: createEntity
       description: >-
-        Create new entity. Only admins, managers and account managers may create new entities. 
-        NOTE! If the entity is to be assigned to a hidden organization 
+        Create new entity. Only admins, managers and account managers may create new entities.
+        NOTE! If the entity is to be assigned to a hidden organization
         (i.e. the flag `hide_organization` is set to `True` in the request data) 
         and a hidden organization already exists within the user's management group, 
-        the new entity is assigned to that organization 
-        (NOTE that a single hidden organization may existing within a management group), 
-        otherwise a new hidden organization is created. NOTE! If the new entity is intended 
-        to be part of a "single entity" management group 
+        the new entity is assigned to that organization
+        (NOTE that a single hidden organization may exist within a management group), 
+        otherwise a new hidden organization is created.
+        NOTE! If the new entity is intended to be part of a "single entity" management group 
         (i.e. the flag `is_single_entity` is set to `True` in the request data), 
-        it will automatically be assigned to a hidden organization 
-        (this is hardcoded also in the front-end), and the `is_single_entity` 
-        flag will be set `True` on the management group. NOTE! On creating a new entity, 
-        full permissions on this entity are assigned to: 
-        the creating user; all managers that have access to the organization containing this entity;
+        it will automatically be assigned to a hidden organization, and the `is_single_entity` 
+        flag will be set `True` on the management group.
+        NOTE! On creating a new entity, full permissions on this entity are assigned to:
+        the creating user, all managers that have access to the organization containing this entity,
         all admins in the same management group.
       tags:
         - Entity
@@ -1267,7 +1266,7 @@ paths:
     get:
       summary: Get a specific entity
       operationId: getSpecificEntity
-      description: Retrieve the entity data. Only users with the `entity_management` view permission may call this endpoint.
+      description: Retrieve the entity data.
       tags:
         - Entity
       responses:
@@ -1293,7 +1292,7 @@ paths:
     put:
       summary: Edit specific entity
       operationId: putSpecificEntity
-      description: Update entity data. Only users with the `entity_management` modify permission may call this endpoint.
+      description: Update entity data.
       tags:
         - Entity
       responses:
@@ -1342,9 +1341,8 @@ paths:
     patch:
       summary: Patch specific entity
       operationId: patchSpecificEntity
-      description: ->
-        Partial update of entity data. Only users with the `entity_management' 
-        modify permission may call this endpoint.
+      description:
+        Partial update of entity data.
       tags:
         - Entity
       responses:
@@ -1390,8 +1388,7 @@ paths:
       summary: Delete an entity
       operationId: deleteEntity
       description: ->
-        Deletes the entity. Only users with the `entity_management` 
-        modify permission may call this endpoint. 
+        Deletes the entity.
         NOTE! Only entities with no VAT returns generated may be deleted.
       tags:
         - Entity
@@ -1417,11 +1414,8 @@ paths:
     get:
       summary: List organizations
       operationId: listOrganizations
-      description: ->
-        List the organizations that the user may access (view and/or modify). 
-        Any authenticated user may call this endpoint. 
-        An empty list is returned if the user does not have access to any 
-        organizations or does not have the required permissions.
+      description:
+        List the organizations. An organization is equivalent to a team/group containing any number of entities. 
       tags:
         - Organization
       parameters:
@@ -1515,7 +1509,7 @@ paths:
     get:
       summary: Get a specific organization
       operationId: getSpecificOrganization
-      description: Retrieve the organization data. Only users with the `org_management` view permission may call this endpoint.
+      description: Retrieve the organization data.
       tags:
         - Organization
       responses:
