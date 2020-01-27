@@ -306,10 +306,6 @@ components:
               type: string
             name_long:
               type: string
-        is_day_editable:
-          type: boolean
-        is_moneth_editable:
-          type: boolean
         comment:
           type: string
         is_automatically_created:
@@ -490,8 +486,6 @@ components:
                   - country
                   - filing_period
                   - filing_type
-                  - is_day_editable
-                  - is_month_editable
                   - comment
                   - is_automatically_created
                 properties:
@@ -515,10 +509,6 @@ components:
                         type: string
                       name_long:
                         type: string
-                  is_day_editable:
-                    type: boolean
-                  is_month_editable:
-                    type: boolean
                   comment:
                     type: string
                   is_automatically_created:
@@ -575,6 +565,7 @@ components:
         - number
         - has_client_transaction_types
         - date_registration
+        - list_vat_number_period
         - date_modified
         - date_created
       properties:
@@ -618,6 +609,61 @@ components:
         date_registration:
           type: string
           format: date-time
+        list_vat_number_period:
+          type: array
+          items:
+            type: object
+            properties:
+              period:
+                type: object
+                required:
+                  - id
+                  - country
+                  - filing_period
+                  - filing_type
+                  - comment
+                  - is_automatically_created
+                properties:
+                  id:
+                    $ref: "#/components/schemas/id"
+                  country:
+                    $ref: "#/components/schemas/id"
+                  filing_period:
+                    type: string
+                    description: "Choices: [monthly, monthly_extension, bi-monthly, quarterly, quarterly_extension, annually, semi-annually, tri-annually]"
+                  filing_type:
+                    type: object
+                    required:
+                      - id
+                      - name_short
+                      - name_long
+                    properties:
+                      id:
+                        $ref: "#/components/schemas/id"
+                      name_short:
+                        type: string
+                      name_long:
+                        type: string
+                  comment:
+                    type: string
+                  is_automatically_created:
+                    type: boolean
+              day_month:
+                type: integer
+              working_day_number:
+                type: integer
+              ending_month:
+                type: array
+                items:
+                  type: integer
+              internal_ref:
+                type: string
+              date_modified:
+                type: string
+                format: date-time
+              date_created:
+                type: string
+                format: date-time
         date_modified:
           type: string
           format: date-time
@@ -1451,9 +1497,9 @@ paths:
       summary: Create a new organization
       operationId: createOrganization
       description: >-
-        Create new organization. Only admins and managers may create new organizations. 
+        Create new organization.
         On creating a new organization, full permissions on this organization are 
-        assigned to the creating user and all the admins in the same management group.
+        assigned to all the admins in the same management group.
       tags:
         - Organization
       parameters:
@@ -1535,7 +1581,7 @@ paths:
     put:
       summary: Edit specific organization
       operationId: putSpecificOrganization
-      description: Update organization data. Only users with the `org_management` modify permission may call this endpoint.
+      description: Update organization data.
       tags:
         - Organization
       responses:
@@ -1588,9 +1634,8 @@ paths:
     patch:
       summary: Patch specific organization
       operationId: patchSpecificOrganization
-      description: ->
-        Partial update of organization data. Only users with the `org_management' 
-        modify permission may call this endpoint.
+      description:
+        Partial update of organization data.
       tags:
         - Organization
       responses:
@@ -1641,9 +1686,8 @@ paths:
     delete:
       summary: Delete an organization
       operationId: deleteOrganization
-      description: ->
-        Deletes the organization. Only users with the `org_management` 
-        modify permission may call this endpoint. NOTE! Only organizations 
+      description:
+        Deletes the organization. NOTE! Only organizations 
         with no entities may be deleted. If the organization contains entities, 
         these need to be deleted/moved to a different organization first.
       tags:
@@ -1959,8 +2003,8 @@ paths:
     get:
       summary: List all vat numbers
       operationId: listAllVatnumbers
-      description: ->
-        Retrieve a list of all vat numbers
+      description:
+        Retrieve a list of all VatNumber objects
       tags:
         - Vat number
       parameters:
@@ -2011,8 +2055,8 @@ paths:
     get:
       summary: List entity vat numbers
       operationId: listEntityVatnumbers
-      description: ->
-        Retrieve a list of vat numbers for a specific entity
+      description:
+        Retrieve a list of VatNumber objectd for a specific entity
       tags:
         - Vat number
       parameters:
@@ -2070,8 +2114,7 @@ paths:
       summary: Create a new vat number
       operationId: createVatNumber
       description: >-
-        Create a new VAT number. Only admins, managers, account managers and registrations 
-        account managers may create new VAT numbers. On creating a new VAT number, 
+        Create a new VAT number. On creating a new VAT number, 
         full permissions on this VAT number are assigned to: 
         the creating user; all account managers that have access to the entity that 
         this VAT number belongs to; all managers that have access to the organization 
@@ -2403,7 +2446,7 @@ paths:
     get:
       summary: List vat return entries
       operationId: listVatReturnEntries
-      description: ->
+      description:
         Retrieve a list of vat return entries for a standard template
       tags:
         - VAT return
