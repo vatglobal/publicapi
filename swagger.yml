@@ -1922,7 +1922,7 @@ paths:
     patch:
       summary: Patch specific saved filing period
       operationId: patchSpecificSFP
-      description: ->
+      description:
         SavedFilingPeriod correspond to a calendar event (filing date)
       tags:
         - Saved filing periods
@@ -1961,7 +1961,7 @@ paths:
     put:
       summary: Edit specific saved filing period
       operationId: editSpecificSFP
-      description: ->
+      description:
         SavedFilingPeriod correspond to a calendar event (filing date)
       tags:
         - Saved filing periods
@@ -2190,7 +2190,7 @@ paths:
     put:
       summary: Edit specific vat number
       operationId: putSpecificVatNumber
-      description: "Update an existing VAT number. Only users with the 'vat_reg_info' modify permission may call this endpoint."
+      description: "Update an existing VAT number."
       tags:
         - Vat number
       responses:
@@ -2265,7 +2265,7 @@ paths:
     patch:
       summary: Partial update specific vat number
       operationId: patchSpecificVatNumber
-      description: "Perform a partial update on an existing VAT number. Only users with the 'vat_reg_info' modify permission may call this endpoint."
+      description: "Perform a partial update on an existing VAT number."
       tags:
         - Vat number
       responses:
@@ -2334,7 +2334,7 @@ paths:
     delete:
       summary: Delete a vat number
       operationId: deleteVatNumber
-      description: ->
+      description:
         Mark an existing VAT number as deleted. NOTE! The VAT number is NOT physically deleted.
       tags:
         - Vat number
@@ -2394,7 +2394,7 @@ paths:
 
     post:
       summary: Run standard template compliance checks
-      description: ->
+      description:
         Call to start compliance checks for uploaded 
         saved_filing_period files, gamechanger files, and JSON uploads.
         Creates a new StandardTemplateJob for each file sent in request body. 
@@ -2491,7 +2491,7 @@ paths:
     get:
       summary: List standard templates
       operationId: listStandardTemplates
-      description: ->
+      description:
         Retrieve a list of standard templates for a given saved filing period
       tags:
         - Standard template
@@ -2537,7 +2537,7 @@ paths:
                 $ref: "#/components/schemas/errorMessageDict"
 
     post:
-      summary: Create a new standard tempalte
+      summary: Create a new standard template
       operationId: createStandardTemplate
       description: >-
         Create a new standard template for a given saved filing period
@@ -2569,7 +2569,7 @@ paths:
     get:
       summary: Retrieve standard template
       operationId: getStandardTemplate
-      description: ->
+      description:
         Retrieve a standard template
       tags:
         - Standard template
@@ -2649,7 +2649,7 @@ paths:
     get:
       summary: List aggregates
       operationId: listStandardTemplateAggregates
-      description: ->
+      description:
         Retrieve a list of standard template aggregates for a given standard template.
         An aggregate is a summary of all transactions for a transaction_type. It is useful 
         for getting a high level view of your standard template transaction data.
@@ -2696,7 +2696,7 @@ paths:
     get:
       summary: List entries
       operationId: listStandardTemplateEntries
-      description: ->
+      description:
         Retrieve a list of standard template entries for a given standard template. 
         An entry is a transaction without any compliance errors.
       tags:
@@ -2755,7 +2755,7 @@ paths:
     get:
       summary: List entry errors
       operationId: listStandardTemplateEntryErrors
-      description: ->
+      description:
         Retrieve a list of standard template entry errors for a given standard template. 
         An entry error is a transaction with at least one compliance error.
       tags:
@@ -2814,7 +2814,7 @@ paths:
     get:
       summary: List transaction types
       operationId: listStandardTemplateTransactionTypes
-      description: ->
+      description:
         List of distinct client transaction types for entries and entry errors in a StandardTemplate
       tags:
         - Standard template
@@ -2844,7 +2844,7 @@ paths:
     get:
       summary: List JSON uploads files
       operationId: listStandardTemplateJSONfiles
-      description: ->
+      description:
         List all JSON upload files for a standard template
       tags:
         - Standard template
@@ -2870,7 +2870,7 @@ paths:
 
     post:
       summary: Create a new JSON Upload
-      description: ->
+      description:
         Send row data to save as a JSON upload object.
         This JSON upload object can then be used as data
         for the associated standard template.
@@ -2944,7 +2944,7 @@ paths:
     get:
       summary: List JSON uploads file rows
       operationId: listStandardTemplateJSONfileRows
-      description: ->
+      description:
         List all rows for a JSON upload file in a standard template
       tags:
         - Standard template
@@ -2971,7 +2971,7 @@ paths:
     put:
       summary: Edit JSON upload rows
       operationId: putJSONUploadRows
-      description: ->
+      description:
         Update an existing JSON upload. Options
 
           1) Edit an existing row `id=row_id`
@@ -3054,7 +3054,7 @@ paths:
     delete:
       summary: Delete a JSON upload
       operationId: deleteJSONUpload
-      description: ->
+      description:
         Deletes JSON upload object and all associated rows
       tags:
         - Standard template
