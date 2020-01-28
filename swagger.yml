@@ -38,7 +38,7 @@ tags:
       To do this, use the `Run standard template compliance checks` endpoint. <br>
       Once we have checked your data, any issues will be represented as either `compliance warnings` or `compliance errors`. <br>
       These will be included in the `List entries` or `List entry errors` endpoints. <br>
-      To make ammendmants to these affected rows, use the `Edit rows` endpoint
+      To make ammendmants to these affected rows, use the `Edit entry and entry errors` endpoint
 servers:
   - url: https://server.myvsuite.com/api/v1/
 
@@ -3022,7 +3022,12 @@ paths:
                       id:
                         type: string
                         format: uuid
+                        example: ID if editing an existing row. null if adding a new row
                         description: "ID if editing an existing row. null if adding a new row"
+                      removed:
+                        type: boolean
+                        example: Add this flag to remove a row. If removing, only include id attribute alongside this flag.
+                        description: "Add this flag to remove a row. If removing, only include id attribute alongside this flag."
                       invoice_number:
                         type: string
                         example: "GB12377718928"
@@ -3052,9 +3057,6 @@ paths:
                       client_transaction_type:
                         type: string
                         example: "Local purchase"
-                      removed:
-                        type: boolean
-                        description: "Add this flag to remove a row. If removing, only include id attribute alongside this flag."
 
     delete:
       summary: Delete a JSON upload
@@ -3078,3 +3080,127 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorMessageDict"
+
+
+  /vFile/standardTemplateEditRows/{standard_template_id}/:
+
+    post:
+      summary: Edit entry and entry errors
+      description:
+        "Make ammendmants to existing entries and entry errors for a standard template. <br>
+        Use to correct the cause of a compliance error/ warning, or modify data without having to reupload. <br>
+        can:
+            - change entries or entry errors
+            - remove entries (add is_remove flag to row)
+            - add a new entry (begins standard template level job)"
+      operationId: editEntryorEntryError
+      tags:
+        - Standard template
+      responses:
+        '200':
+          description: Edit job has been started
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                list_rows:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                        example: <row_id> if editing existing   OR   null if new row
+                        description: <row_id> if editing existing   OR   null if new row
+                      removed:
+                        type: boolean
+                        example: Add this flag to remove a row. If removing, only include id attribute alongside this flag.
+                        description: Add this flag to remove a row. If removing, only include id attribute alongside this flag.
+                      invoice_number:
+                        type: string
+                        example: "GB12377718928"
+                      invoice_date:
+                        type: string
+                        example: "DD/MM/YYYY"
+                      partner_name:
+                        type: string
+                      partner_country:
+                        type: string
+                        example: "GB"
+                      partner_vat_number:
+                        type: string
+                        example: "GB12377718928"
+                      ccy_transaction:
+                        type: string
+                        example: "GBP"
+                      net_orig:
+                        type: string
+                        example: "954.32"
+                      vat_orig:
+                        type: string
+                        example: "954.32"
+                      gross_orig:
+                        type: string
+                        example: "954.32"
+                      client_transaction_type:
+                        type: string
+                        example: "Local purchase"
+                list_errors:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                        example: <error_id> if editing existing   OR   null if new row
+                        description: <error_id> if editing existing   OR   null if new row
+                      removed:
+                        type: boolean
+                        example: Add this flag to remove an error. If removing, only include id attribute alongside this flag.
+                        description: Add this flag to remove an error. If removing, only include id attribute alongside this flag.
+                      invoice_number:
+                        type: string
+                        example: "GB12377718928"
+                      invoice_date:
+                        type: string
+                        example: "DD/MM/YYYY"
+                      partner_name:
+                        type: string
+                      partner_country:
+                        type: string
+                        example: "GB"
+                      partner_vat_number:
+                        type: string
+                        example: "GB12377718928"
+                      ccy_transaction:
+                        type: string
+                        example: "GBP"
+                      net_orig:
+                        type: string
+                        example: "954.32"
+                      vat_orig:
+                        type: string
+                        example: "954.32"
+                      gross_orig:
+                        type: string
+                        example: "954.32"
+                      client_transaction_type:
+                        type: string
+                        example: "Local purchase"
+
