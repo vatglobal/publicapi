@@ -32,8 +32,13 @@ tags:
   - name: Period
     description: Manage your period objects
   - name: Standard template
-    description: Standard templates are how we map transaction data to a saved filing period
-
+    description: >-
+      Standard templates are how we map transaction data to a saved filing period. <br>
+      For us to process your data, we must run a few compliance and integrity checks on the data to ensure it's fit for submittable. <br>
+      To do this, use the `Run standard template compliance checks` endpoint. <br>
+      Once we have checked your data, any issues will be represented as either `compliance warnings` or `compliance errors`. <br>
+      These will be included in the `List entries` or `List entry errors` endpoints. <br>
+      To make ammendmants to these affected rows, use the `Edit rows` endpoint
 servers:
   - url: https://server.myvsuite.com/api/v1/
 
