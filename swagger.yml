@@ -36,6 +36,7 @@ tags:
       Standard templates are how we map transaction data to a saved filing period. <br>
       For us to process your data, we must run a few compliance and integrity checks on the data to ensure it's fit for submittable. <br>
       To do this, use the `Run standard template compliance checks` endpoint. <br>
+      When we run compliance checks on your data, the progress of these checks are contained in a `Job` object.<br>
       Once we have checked your data, any issues will be represented as either `compliance warnings` or `compliance errors`. <br>
       These will be included in the `List entries` or `List entry errors` endpoints. <br>
       To make ammendmants to these affected rows, use the `Edit entry and entry errors` endpoint
@@ -1196,6 +1197,73 @@ components:
         date_created:
           type: string
           format: date-time
+
+    StandardTemplateJobList:
+      type: object
+      required:
+        - count
+        - next
+        - previous
+        - results
+      properties:
+        count:
+          type: integer
+        next:
+          type: integer
+        previous:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/StandardTemplateJob"
+    StandardTemplateJob:
+      type: object
+      required:
+        - id
+        - standard_template
+        - standard_template_aggregate
+        - name
+        - is_running
+        - is_aggregate_job
+        - status
+        - total_rows
+        - completed_rows
+        - errored_rows
+        - cancelled
+        - date_started
+        - percentage_complete
+        - run_time
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        standard_template:
+          $ref: "#/components/schemas/id"
+        standard_template_aggregate:
+          $ref: "#/components/schemas/id"
+        name:
+          type: string
+        is_running:
+          type: boolean
+        is_aggregate_job:
+          type: boolean
+        status:
+          type: string
+          example: "initializing | in_progress | complete | cancelled"
+        total_rows:
+          type: integer
+        completed_rows:
+          type: integer
+        errored_rows:
+          type: integer
+        cancelled:
+          type: boolean
+        date_started:
+          type: string
+          format: date-time
+        percentage_complete:
+          type: integer
+        run_time:
+          type: integer
 
 
 
@@ -3173,7 +3241,7 @@ paths:
                       removed:
                         type: boolean
                         example: Add this flag to remove an error. If removing, only include id attribute alongside this flag.
-                        description: Add this flag to remove an error. If removing, only include id attribute alongside this flag.
+                        description: Add this flag to remove an error29/10. If removing, only include id attribute alongside this flag.
                       invoice_number:
                         type: string
                         example: "GB12377718928"
@@ -3203,4 +3271,69 @@ paths:
                       client_transaction_type:
                         type: string
                         example: "Local purchase"
+
+
+  /vFile/StandardTemplateJob/:
+
+    get:
+      summary: List in progress jobs
+      operationId: listStandardTemplateJobs
+      description:
+        When we run compliance checks against a set of data, it's current status through
+        the compliance checks is contained inside a `Job`. <br>
+        This endpoint returns all jobs that are in the state `initializing` or `in_progress`. <br>
+        Use this endpoint to checks the progress on in_progress jobs.
+      tags:
+        - Standard template
+      responses:
+        '200':
+          description: List of in progress jobs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardTemplateJobList"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
+
+
+  /vFile/StandardTemplateJob/{standard_template_job_id}/:
+
+    get:
+      summary: Get specific job details
+      operationId: getStandardTemplateJob
+      description:
+        When we run compliance checks against a set of data, it's current status through
+        the compliance checks is contained inside a `Job`. <br>
+        This endpoint returns details for a specific job<br>
+      tags:
+        - Standard template
+      responses:
+        '200':
+          description: Specific job information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardTemplateJob"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDetail"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorMessageDict"
 
