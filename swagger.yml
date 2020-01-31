@@ -34,7 +34,7 @@ tags:
   - name: Standard template
     description: >-
       Standard templates are how we map transaction data to a saved filing period. <br>
-      For us to process your data, we must run a few compliance and integrity checks on the data to ensure it's fit for submittable. <br>
+      For us to process your data, we must run a few compliance and integrity checks on the data to ensure it's fit for submission. <br>
       To do this, use the `Run standard template compliance checks` endpoint. <br>
       When we run compliance checks on your data, the progress of these checks are contained in a `Job` object.<br>
       Once we have checked your data, any issues will be represented as either `compliance warnings` or `compliance errors`. <br>
@@ -3241,7 +3241,7 @@ paths:
                       removed:
                         type: boolean
                         example: Add this flag to remove an error. If removing, only include id attribute alongside this flag.
-                        description: Add this flag to remove an error29/10. If removing, only include id attribute alongside this flag.
+                        description: Add this flag to remove an error. If removing, only include id attribute alongside this flag.
                       invoice_number:
                         type: string
                         example: "GB12377718928"
