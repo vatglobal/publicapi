@@ -1,5 +1,6 @@
 openapi: '3.0.2'
 
+
 info:
   title: vsuite public api
   version: '1.0'
@@ -2129,7 +2130,7 @@ paths:
       summary: List entity vat numbers
       operationId: listEntityVatnumbers
       description:
-        Retrieve a list of VatNumber objectd for a specific entity
+        Retrieve a list of VatNumber objects for a specific entity
       tags:
         - Vat number
       parameters:
