@@ -2560,7 +2560,7 @@ paths:
                 $ref: "#/components/schemas/errorMessageDict"
 
 
-  /vFile/standardTemplate/:
+  /vFile/standardTemplate/?saved_filing_period={saved_filing_period}:
 
     get:
       summary: List standard templates
