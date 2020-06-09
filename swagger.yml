@@ -30,6 +30,8 @@ tags:
     description: Manage your vat number objects
   - name: Saved filing periods
     description: Manage your saved filing period objects
+  - name: Filing status
+    description: See the various filing status
   - name: Period
     description: Manage your period objects
   - name: Standard template
@@ -1857,7 +1859,22 @@ paths:
                 $ref: "#/components/schemas/errorMessageDetail"
 
 
-  /vFile/period:
+  /vFlow/filingStatus/:
+    get:
+        summary: List filing statuses
+        operationId: filingStatuses
+        tags:
+          - Filing status
+    responses:
+        '200':
+          description: List of filing statuses
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListFilingStatuses"
+ 
+ 
+  /vFile/period/:
 
     get:
       summary: List periods
@@ -1954,15 +1971,21 @@ paths:
                   description: "list of entity ids to filter saved filing periods with"
                 date_start:
                   type: string
-                  description: "start of date range"
+                  description: "start of date range for the due date"
                   example: "YYYY-MM-DD"
                 date_end:
                   type: string
-                  description: "end of date range"
+                  description: "end of date range for the due date"
                   example: "YYYY-MM-DD"
                 stage:
                   type: string
                   description: "Saved filing period stage. Choice of [due, preparing, filed]"
+                list_filing_types:
+                  type: string
+                  description: "list of filing types ids"
+                list_filing_status:
+                  type: string
+                  description: "list of filing status names (underscored string such as 'get_started')"
 
 
   /vFile/savedFilingPeriod/{saved_filing_period_id}:
