@@ -265,6 +265,19 @@ components:
           description: "Is this country in the EU?"
         currency:
           $ref: "#/components/schemas/id"
+    
+    ListFilingStatuses:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+        results:
+          type: array
+          items:
+            type: string
 
     ListPeriods:
       type: object
