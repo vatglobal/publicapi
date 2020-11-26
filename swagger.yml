@@ -1958,7 +1958,7 @@ paths:
 
   /vFile/savedFilingPeriod:
 
-    post:
+    get:
       summary: List saved filing periods
       description: "SavedFilingPeriod corresponds to a calendar event (filing date)"
       operationId: listSFP
@@ -1967,18 +1967,72 @@ paths:
       parameters:
         - name: limit
           in: query
-          description: how many items to return in one page
+          description: "how many items to return in one page"
           required: false
           schema:
             type: integer
             format: int32
         - name: offset
           in: query
-          description: how many items to offset (number of pages * limit size)
+          description: "how many items to offset (number of pages * limit size)"
           required: false
           schema:
             type: integer
             format: int32
+        - name: ordering
+          in: query
+          description: "the ordering to retrieve the results in. choices are [country, name, date_filing_due, date_period_ending, filing_status]"
+          required: false
+          schema:
+            type: string
+        - name: asc_desc
+          in: query
+          description: "whether the ordering should be ascending or descending. choices are [asc, desc]"
+          required: false
+          schema:
+            type: string
+        - name: list_countries
+          in: query
+          description: "list of country ids to filter the saved filing periods by. construct the parameters by concatenating the queries to the query string with list_countries[]=country_id. e.g. list_countries[]=id_1&list_countries[]=id_2"
+          required: false
+          schema:
+            type: string
+        - name: list_entities
+          in: query
+          description: "list of entity ids to filter the saved filing periods by. construct the parameters by concatenating the queries to the query string with list_entities[]=entity_id. e.g. list_entities[]=id_1&list_entities[]=id_2"
+          required: false
+          schema:
+            type: string
+        - name: list_filing_types
+          in: query
+          description: "list of filing type ids to filter the saved filing periods by. construct the parameters by concatenating the queries to the query string with list_filing_types[]=filing_type_id. e.g. list_filing_types[]=id_1&list_filing_types[]=id_2"
+          required: false
+          schema:
+            type: string
+        - name: list_filing_status
+          in: query
+          description: "list of filing statuses to filter the saved filing periods by. construct the parameters by concatenating the queries to the query string with list_filing_status[]=filing_status. e.g. list_filing_status[]=string_1&list_filing_status[]=string_2"
+          required: false
+          schema:
+            type: string
+        - name: stage
+          in: query
+          description: "Saved filing period stage. Choice of [due, preparing, filed]"
+          required: false
+          schema:
+            type: string
+        - name: date_start
+          in: query
+          description: "start of date range for the due date [YYYY-MM-DD]"
+          required: false
+          schema:
+            type: string
+        - name: date_end
+          in: query
+          description: "end of date range for the due date [YYYY-MM-DD]"
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: List of saved filing periods. Filtering applied if specified in request body.
@@ -2097,7 +2151,7 @@ paths:
                   description: "Choices: [get_started, processed, processing, compliance_errors, upload_failed, processing_errors, ready_file, ready_file_nil, awaiting_review, rejected, filed, canceled]"
                 outcome_type:
                   type: string
-                  description: "Choices: [payment_due, payment_madeno_payment_due, refund_due, refund_requested, refund_carried_forward, refund_received, nil_return]"
+                  description: "Choices: [payment_due, payment_made, no_payment_due, refund_due, refund_requested, refund_carried_forward, refund_received, nil_return]"
                 outcome_amount:
                   type: number
                   format: float
