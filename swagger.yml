@@ -1991,27 +1991,27 @@ paths:
           required: false
           schema:
             type: string
-        - name: list_countries
+        - name: countries
           in: query
-          description: "list of country ids to filter the saved filing periods by. construct the parameters by concatenating the queries to the query string with list_countries[]=country_id. e.g. list_countries[]=id_1&list_countries[]=id_2"
+          description: "list of country ids to filter the saved filing periods by. construct the parameters by concatenating the queries to the query string with countries=country_id. e.g. countries=id_1&countries=id_2"
           required: false
           schema:
             type: string
-        - name: list_entities
+        - name: entities
           in: query
-          description: "list of entity ids to filter the saved filing periods by. construct the parameters by concatenating the queries to the query string with list_entities[]=entity_id. e.g. list_entities[]=id_1&list_entities[]=id_2"
+          description: "list of entity ids to filter the saved filing periods by. construct the parameters by concatenating the queries to the query string with entities=entity_id. e.g. entities=id_1&entities=id_2"
           required: false
           schema:
             type: string
-        - name: list_filing_types
+        - name: filing_types
           in: query
-          description: "list of filing type ids to filter the saved filing periods by. construct the parameters by concatenating the queries to the query string with list_filing_types[]=filing_type_id. e.g. list_filing_types[]=id_1&list_filing_types[]=id_2"
+          description: "list of filing type ids to filter the saved filing periods by. construct the parameters by concatenating the queries to the query string with filing_types=filing_type_id. e.g. filing_types=id_1&filing_types=id_2"
           required: false
           schema:
             type: string
-        - name: list_filing_status
+        - name: filing_statuses
           in: query
-          description: "list of filing statuses to filter the saved filing periods by. construct the parameters by concatenating the queries to the query string with list_filing_status[]=filing_status. e.g. list_filing_status[]=string_1&list_filing_status[]=string_2"
+          description: "list of filing statuses to filter the saved filing periods by. construct the parameters by concatenating the queries to the query string with filing_statuses=filing_status. e.g. filing_statuses=string_1&filing_statuses=string_2"
           required: false
           schema:
             type: string
