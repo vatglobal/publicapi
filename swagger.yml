@@ -30,6 +30,8 @@ tags:
     description: Manage your vat number objects
   - name: Saved filing periods
     description: Manage your saved filing period objects
+  - name: Filing status
+    description: See the various filing status
   - name: Period
     description: Manage your period objects
   - name: Standard template
@@ -263,6 +265,19 @@ components:
           description: "Is this country in the EU?"
         currency:
           $ref: "#/components/schemas/id"
+
+    ListFilingStatuses:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+        results:
+          type: array
+          items:
+            type: string
 
     ListPeriods:
       type: object
@@ -995,7 +1010,7 @@ components:
           items:
             type: string
             example: "Type of compliance warning, denoted by a warning code"
-
+      
     StandardTemplateEntryErrorList:
       type: object
       required:
@@ -1303,7 +1318,7 @@ components:
 paths:
 
   /entity:
-
+    
     get:
       summary: List entities
       operationId: listEntities
@@ -1567,7 +1582,7 @@ paths:
       summary: List organizations
       operationId: listOrganizations
       description:
-        List the organizations. An organization is equivalent to a team/group containing any number of entities.
+        List the organizations. An organization is equivalent to a team/group containing any number of entities. 
       tags:
         - Organization
       parameters:
@@ -1793,8 +1808,8 @@ paths:
       summary: Delete an organization
       operationId: deleteOrganization
       description:
-        Deletes the organization. NOTE! Only organizations
-        with no entities may be deleted. If the organization contains entities,
+        Deletes the organization. NOTE! Only organizations 
+        with no entities may be deleted. If the organization contains entities, 
         these need to be deleted/moved to a different organization first.
       tags:
         - Organization
@@ -1889,7 +1904,22 @@ paths:
                 $ref: "#/components/schemas/errorMessageDetail"
 
 
-  /vFile/period:
+  /vFlow/filingStatus/:
+    get:
+        summary: List filing statuses
+        operationId: filingStatuses
+        tags:
+          - Filing status
+    responses:
+        '200':
+          description: List of filing statuses
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListFilingStatuses"
+
+
+  /vFile/period/:
 
     get:
       summary: List periods
@@ -1928,7 +1958,7 @@ paths:
 
   /vFile/savedFilingPeriod:
 
-    get:
+    post:
       summary: List saved filing periods
       description: "SavedFilingPeriod corresponds to a calendar event (filing date)"
       operationId: listSFP
@@ -1949,62 +1979,6 @@ paths:
           schema:
             type: integer
             format: int32
-        - name: ordering
-          in: query
-          description: Field to order on. Choice of [country, name, date_filing_due, date_period_ending, filing_status]
-          required: false
-          schema:
-            type: string
-        - name: asc_desc
-          in: query
-          description: Whether the ordering should be ascending or descending. Choices of [asc, desc]
-          required: false
-          schema:
-            type: string
-        - name: list_countries
-          in: query
-          description: list of country ids to filter saved filing periods with. ?list_countries[]="XXXX"&list_countries[]="YYYY"
-          required: false
-          schema:
-            type: string
-        - name: list_entities
-          in: query
-          description: list of entity ids to filter saved filing periods with. ?list_entities[]="XXXX"&list_entities[]="YYYY"
-          required: false
-          schema:
-            type: string
-        - name: list_filing_types
-          in: query
-          description: list of filing type ids to filter saved filing periods with. ?list_filing_types[]="XXXX"&list_filing_types[]="YYYY"
-          required: false
-          schema:
-            type: string
-        - name: list_filing_status
-          in: query
-          description: list of filing statuses to filter saved filing periods with. ?list_filing_status[]="XXXX"&list_filing_status[]="YYYY"
-          required: false
-          schema:
-            type: string
-        - name: date_start
-          in: query
-          description: start of date range [YYYY-MM-DD]
-          required: false
-          schema:
-            type: string
-            format: date
-        - name: date_end
-          in: query
-          description: end of date range [YYYY-MM-DD]
-          required: false
-          schema:
-            type: string
-            format: date
-        - name: stage
-          in: query
-          description: Saved filing period stage. Choice of [due, preparing, filed]
-          required: false
-          schema:
-            type: string
       responses:
         '200':
           description: List of saved filing periods. Filtering applied if specified in request body.
@@ -2129,7 +2103,7 @@ paths:
                   format: float
                 comment_accept_reject:
                   type: string
-                  description: "Comment during approval process"
+                  description: "Comment during approval process"  
 
 
   /vFile/vatNumber?entity_id='all':
@@ -2240,7 +2214,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorMessageDict"
-
+    
 
   /vFile/vatNumber:
 
@@ -2529,10 +2503,10 @@ paths:
     post:
       summary: Run standard template compliance checks
       description:
-        Call to start compliance checks for uploaded
+        Call to start compliance checks for uploaded 
         saved_filing_period files, gamechanger files, and JSON uploads.
-        Creates a new StandardTemplateJob for each file sent in request body.
-        This will overwrite all previous transaction data for this
+        Creates a new StandardTemplateJob for each file sent in request body. 
+        This will overwrite all previous transaction data for this 
         standard template, including all versions.
       operationId: runSTComplianceChecks
       tags:
@@ -2696,7 +2670,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorMessageDict"
-
+  
 
   /vFile/standardTemplate/{standard_template_id}:
 
@@ -2785,7 +2759,7 @@ paths:
       operationId: listStandardTemplateAggregates
       description:
         Retrieve a list of standard template aggregates for a given standard template.
-        An aggregate is a summary of all transactions for a transaction_type. It is useful
+        An aggregate is a summary of all transactions for a transaction_type. It is useful 
         for getting a high level view of your standard template transaction data.
       tags:
         - Standard template
@@ -2831,7 +2805,7 @@ paths:
       summary: List entries
       operationId: listStandardTemplateEntries
       description:
-        Retrieve a list of standard template entries for a given standard template.
+        Retrieve a list of standard template entries for a given standard template. 
         An entry is a transaction without any compliance errors.
       tags:
         - Standard template
@@ -2890,7 +2864,7 @@ paths:
       summary: List entry errors
       operationId: listStandardTemplateEntryErrors
       description:
-        Retrieve a list of standard template entry errors for a given standard template.
+        Retrieve a list of standard template entry errors for a given standard template. 
         An entry error is a transaction with at least one compliance error.
       tags:
         - Standard template
@@ -3108,9 +3082,9 @@ paths:
       description:
         Update an existing JSON upload. Options
 
-        1) Edit an existing row `id=row_id`
-        2) Add a new row `id=null`
-        3) Remove a row `id=row_id and removed=true`
+          1) Edit an existing row `id=row_id`
+          2) Add a new row `id=null`
+          3) Remove a row `id=row_id and removed=true`
       tags:
         - Standard template
       responses:
