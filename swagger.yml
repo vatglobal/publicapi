@@ -42,15 +42,15 @@ tags:
       When we run compliance checks on your data, the progress of these checks are contained in a `Job` object.<br>
       Once we have checked your data, any issues will be represented as either `compliance warnings` or `compliance errors`. <br>
       These will be included in the `List entries` or `List entry errors` endpoints. <br>
-      To make ammendmants to these affected rows, use the `Edit entry and entry errors` endpoint
+      To make amendments to these affected rows, use the `Edit entry and entry errors` endpoint
 servers:
   - url: https://server.myvsuite.com/api/v1/
 
 # Authentication and schemas
 components:
-  
+
   securitySchemes:
-    
+
     ApiKeyAuth:
       type: apiKey
       in: header
@@ -62,7 +62,7 @@ components:
         <br>
         Please note that API keys are automatically attached to a ghost user created specifically for the API calls.
   schemas:
-    
+
     errorMessageDetail:
       type: array
       items:
@@ -136,10 +136,10 @@ components:
           type: string
           example: rgba(4%,4,4%,0.4)
           description: "String representing RGBA or HSL colour. Example: rgba(4%,4,4%,0.4)"
-        tax_number: 
+        tax_number:
           type: string
           description: "Tax Identification Number. This is NOT the VAT number."
-    
+
     ListOrganization:
       type: object
       required:
@@ -180,7 +180,7 @@ components:
           type: string
         vflow_block_weekends:
           type: boolean
-    
+
     ListCurrencies:
       type: object
       required:
@@ -217,7 +217,7 @@ components:
         symbol:
           type: string
           example: "&#65;&#102;"
-    
+
     ListCountries:
       type: object
       required:
@@ -265,7 +265,7 @@ components:
           description: "Is this country in the EU?"
         currency:
           $ref: "#/components/schemas/id"
-    
+
     ListFilingStatuses:
       type: object
       required:
@@ -340,6 +340,7 @@ components:
         - next
         - previous
         - results
+        - available_filters
       properties:
         count:
           type: integer
@@ -351,6 +352,37 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SavedFilingPeriod"
+        available_filters:
+          type: object
+          required:
+            - countries
+            - filing_types
+            - filing_statuses
+          properties:
+            countries:
+              type: array
+              items:
+                $ref: "#/components/schemas/AvailableFiltersById"
+              description: "Available country ids to filter by based on the current query parameters"
+            filing_types:
+              type: array
+              items:
+                $ref: "#/components/schemas/AvailableFiltersById"
+              description: "Available filing type ids to filter by based on the current query parameters"
+            filing_statuses:
+              type: array
+              items:
+                $ref: "#/components/schemas/AvailableFiltersByStatus"
+              description: "Available filing statuses to filter by based on the current query parameters"
+
+    AvailableFiltersById:
+      type: string
+      $ref: "#/components/schemas/id"
+
+    AvailableFiltersByStatus:
+      type: string
+      example: get_started
+
     SavedFilingPeriod:
       type: object
       required:
@@ -387,7 +419,7 @@ components:
           description: "Choices: [get_started, processed, processing, compliance_errors, upload_failed, processing_errors, ready_file, ready_file_nil, awaiting_review, rejected, filed, canceled]"
         outcome_type:
           type: string
-          description: "Choices: [payment_due, payment_madeno_payment_due, refund_due, refund_requested, refund_carried_forward, refund_received, nil_return]"
+          description: "Choices: [payment_due, payment_made, no_payment_due, refund_due, refund_requested, refund_carried_forward, refund_received, nil_return]"
         outcome_amount:
           type: number
           format: float
@@ -558,8 +590,8 @@ components:
           format: date-time
         date_created:
           type: string
-          format: date-time    
-          
+          format: date-time
+
     VatNumberAllList:
       type: object
       required:
@@ -1885,8 +1917,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ListFilingStatuses"
- 
- 
+
+
   /vFile/period/:
 
     get:
@@ -1926,7 +1958,7 @@ paths:
 
   /vFile/savedFilingPeriod:
 
-    post:
+    get:
       summary: List saved filing periods
       description: "SavedFilingPeriod corresponds to a calendar event (filing date)"
       operationId: listSFP
@@ -1935,21 +1967,69 @@ paths:
       parameters:
         - name: limit
           in: query
-          description: how many items to return in one page
+          description: "how many items to return in one page"
           required: false
           schema:
             type: integer
             format: int32
         - name: offset
           in: query
-          description: how many items to offset (number of pages * limit size)
+          description: "how many items to offset (number of pages * limit size)"
           required: false
           schema:
             type: integer
             format: int32
+        - name: ordering
+          in: query
+          description: "the ordering to retrieve the results in. choices are [country, name, date_filing_due, date_period_ending, filing_status]. add a - in front of the ordering to reverse order, e.g. -date_filing_due"
+          required: false
+          schema:
+            type: string
+        - name: countries
+          in: query
+          description: "list of comma separated country ids to filter the saved filing periods by, e.g. countries=id_1,id_2"
+          required: false
+          schema:
+            type: string
+        - name: entities
+          in: query
+          description: "list of comma separated entity ids to filter the saved filing periods by, e.g. entities=id_1,id_2"
+          required: false
+          schema:
+            type: string
+        - name: filing_types
+          in: query
+          description: "list of comma separated filing type ids to filter the saved filing periods by, e.g. filing_types=id_1,id_2"
+          required: false
+          schema:
+            type: string
+        - name: filing_statuses
+          in: query
+          description: "list of comma separated filing statuses to filter the saved filing periods by, e.g. filing_statuses=string_1,string_2"
+          required: false
+          schema:
+            type: string
+        - name: stage
+          in: query
+          description: "Saved filing period stage. Choice of [due, preparing, filed]"
+          required: false
+          schema:
+            type: string
+        - name: date_start
+          in: query
+          description: "start of date range for the due date [YYYY-MM-DD]"
+          required: false
+          schema:
+            type: string
+        - name: date_end
+          in: query
+          description: "end of date range for the due date [YYYY-MM-DD]"
+          required: false
+          schema:
+            type: string
       responses:
         '200':
-          description: List of saved filing periods. Filtering applied if specified in request body.
+          description: List of saved filing periods. Filtering applied if specified in query parameters
           content:
             application/json:
               schema:
@@ -1966,40 +2046,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorMessageDetail"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                list_countries:
-                  type: array
-                  items:
-                    type: string
-                  description: "list of country ids to filter saved filing periods with"
-                list_entities:
-                  type: array
-                  items:
-                    type: string
-                  description: "list of entity ids to filter saved filing periods with"
-                date_start:
-                  type: string
-                  description: "start of date range for the due date"
-                  example: "YYYY-MM-DD"
-                date_end:
-                  type: string
-                  description: "end of date range for the due date"
-                  example: "YYYY-MM-DD"
-                stage:
-                  type: string
-                  description: "Saved filing period stage. Choice of [due, preparing, filed]"
-                list_filing_types:
-                  type: string
-                  description: "list of filing types ids"
-                list_filing_status:
-                  type: string
-                  description: "list of filing status names (underscored string such as 'get_started')"
-
 
   /vFile/savedFilingPeriod/{saved_filing_period_id}:
 
@@ -2099,7 +2145,7 @@ paths:
                   description: "Choices: [get_started, processed, processing, compliance_errors, upload_failed, processing_errors, ready_file, ready_file_nil, awaiting_review, rejected, filed, canceled]"
                 outcome_type:
                   type: string
-                  description: "Choices: [payment_due, payment_madeno_payment_due, refund_due, refund_requested, refund_carried_forward, refund_received, nil_return]"
+                  description: "Choices: [payment_due, payment_made, no_payment_due, refund_due, refund_requested, refund_carried_forward, refund_received, nil_return]"
                 outcome_amount:
                   type: number
                   format: float
