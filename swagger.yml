@@ -279,6 +279,20 @@ components:
           items:
             type: string
 
+    FilingType:
+      type: object
+      required:
+        - id
+        - name_short
+        - name_long
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        name_short:
+          type: string
+        name_long:
+          type: string
+
     ListPeriods:
       type: object
       required:
@@ -362,22 +376,18 @@ components:
             countries:
               type: array
               items:
-                $ref: "#/components/schemas/AvailableFiltersById"
-              description: "Available country ids to filter by based on the current query parameters"
+                $ref: "#/components/schemas/Country"
+              description: "Available countries to filter by based on the current query parameters"
             filing_types:
               type: array
               items:
-                $ref: "#/components/schemas/AvailableFiltersById"
-              description: "Available filing type ids to filter by based on the current query parameters"
+                $ref: "#/components/schemas/FilingType"
+              description: "Available filing types to filter by based on the current query parameters"
             filing_statuses:
               type: array
               items:
                 $ref: "#/components/schemas/AvailableFiltersByStatus"
               description: "Available filing statuses to filter by based on the current query parameters"
-
-    AvailableFiltersById:
-      type: string
-      $ref: "#/components/schemas/id"
 
     AvailableFiltersByStatus:
       type: string
@@ -2006,6 +2016,12 @@ paths:
         - name: filing_statuses
           in: query
           description: "list of comma separated filing statuses to filter the saved filing periods by, e.g. filing_statuses=string_1,string_2"
+          required: false
+          schema:
+            type: string
+        - name: filer
+          in: query
+          description: "id of the user assigned as the filer for the saved filing period"
           required: false
           schema:
             type: string
