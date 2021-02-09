@@ -1981,37 +1981,31 @@ paths:
             format: int32
         - name: ordering
           in: query
-          description: "the ordering to retrieve the results in. choices are [country, name, date_filing_due, date_period_ending, filing_status]"
+          description: "the ordering to retrieve the results in. choices are [country, name, date_filing_due, date_period_ending, filing_status]. add a - in front of the ordering to reverse order, e.g. -date_filing_due"
           required: false
           schema:
             type: string
-        - name: asc_desc
+        - name: countries
           in: query
-          description: "whether the ordering should be ascending or descending. choices are [asc, desc]"
+          description: "list of comma separated country ids to filter the saved filing periods by, e.g. countries=id_1,id_2"
           required: false
           schema:
             type: string
-        - name: list_countries
+        - name: entities
           in: query
-          description: "list of country ids to filter the saved filing periods by. construct the parameters by concatenating the queries to the query string with list_countries[]=country_id. e.g. list_countries[]=id_1&list_countries[]=id_2"
+          description: "list of comma separated entity ids to filter the saved filing periods by, e.g. entities=id_1,id_2"
           required: false
           schema:
             type: string
-        - name: list_entities
+        - name: filing_types
           in: query
-          description: "list of entity ids to filter the saved filing periods by. construct the parameters by concatenating the queries to the query string with list_entities[]=entity_id. e.g. list_entities[]=id_1&list_entities[]=id_2"
+          description: "list of comma separated filing type ids to filter the saved filing periods by, e.g. filing_types=id_1,id_2"
           required: false
           schema:
             type: string
-        - name: list_filing_types
+        - name: filing_statuses
           in: query
-          description: "list of filing type ids to filter the saved filing periods by. construct the parameters by concatenating the queries to the query string with list_filing_types[]=filing_type_id. e.g. list_filing_types[]=id_1&list_filing_types[]=id_2"
-          required: false
-          schema:
-            type: string
-        - name: list_filing_status
-          in: query
-          description: "list of filing statuses to filter the saved filing periods by. construct the parameters by concatenating the queries to the query string with list_filing_status[]=filing_status. e.g. list_filing_status[]=string_1&list_filing_status[]=string_2"
+          description: "list of comma separated filing statuses to filter the saved filing periods by, e.g. filing_statuses=string_1,string_2"
           required: false
           schema:
             type: string
@@ -2035,7 +2029,7 @@ paths:
             type: string
       responses:
         '200':
-          description: List of saved filing periods. Filtering applied if specified in request body.
+          description: List of saved filing periods. Filtering applied if specified in query parameters
           content:
             application/json:
               schema:
