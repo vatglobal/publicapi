@@ -266,18 +266,6 @@ components:
         currency:
           $ref: "#/components/schemas/id"
 
-    ListFilingStatuses:
-      type: object
-      required:
-        - count
-        - results
-      properties:
-        count:
-          type: integer
-        results:
-          type: array
-          items:
-            type: string
 
     FilingType:
       type: object
@@ -1912,22 +1900,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorMessageDetail"
-
-
-  /vFlow/filingStatus/:
-    get:
-        summary: List filing statuses
-        operationId: filingStatuses
-        tags:
-          - Filing status
-    responses:
-        '200':
-          description: List of filing statuses
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ListFilingStatuses"
-
 
   /vFile/period/:
 
